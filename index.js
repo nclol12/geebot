@@ -10,12 +10,12 @@ const cheerio = require('cheerio')
 const request = require('request')
 const ping = require('minecraft-server-util')
 const Embed = new Discord.MessageEmbed()
-var version = '1.3';
+var version = '1.5';
 var servers = {};
 
 client.once('ready', () => {
     console.log('UP!')
-    client.user.setActivity("help example")
+    client.user.setActivity("Example status")
 })
 
 client.on('guildMemberAdd', member =>{
@@ -270,11 +270,27 @@ client.on('message', message =>{
 	 
 	})
 
-	client.on("message", (message) => {
-		if(message.content == "gm.help"){ 
-				message.channel.send("help example"); 
-			}
-		});
+client.on('message', message=>{
+     
+      let args = message.content.slice(prefix.length).split(' ');
+      
+   switch(args[0]){
+     case 'help':
+      const embed = new Discord.MessageEmbed()
+        .setTitle('Помощь')
+        .addField('gm.play,stop,skip для плеера')
+        .addField('gm.kick,ban это модерация')
+        .addField('gm.poll голосование')
+        .addField('gm.stat айпи порт | статус серва майнкрафт ')
+        .addField('gm.pic рандомная картинка мем')
+        .addField('original code by Notcher3#8385')
+         .setColor(0xF1C40F)
+        message.channel.send(embed);
+    break;
 
+
+    }
+
+})
 
 client.login(token);

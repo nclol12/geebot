@@ -1,4 +1,4 @@
 {
     "prefix": "your bot prefix",
-    "token": "your bot token"
+    "token": "your oauth2 bot token "
 }
