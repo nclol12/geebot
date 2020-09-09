@@ -16,12 +16,14 @@
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "https": "^1.0.0",
+    "minecraft": "0.0.2",
     "minecraft-server-util": "^1.3.0",
     "moment": "^2.27.0",
     "mongoose": "^5.10.0",
     "opusscript": "0.0.7",
     "path": "^0.12.7",
     "request": "^2.88.2",
+    "weather-js": "^2.0.0",
     "ytdl-core": "^2.1.5"
   }
 }

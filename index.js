@@ -14,6 +14,7 @@ const ping = require('minecraft-server-util')
 const Embed = new Discord.MessageEmbed()
 const moment = require('moment');
 const fs = require('fs');
+const { join } = require('path');
 var version = '1.3';
 var servers = {};
 
@@ -64,7 +65,7 @@ client.on('message', message => {
     if(message.content.startsWith(`${prefix}kick`)) {
         let member = message.mentions.members.first();
         member.kick().then((member) => {
-            message.channel.send("*БАМ* Пользователь был выгнан")
+            message.channel.send("*WHOOSH* User was kicked")
             
       return console.log(`> kicked member  ${message.author.username}`);
             })
@@ -81,7 +82,7 @@ client.on('message', message => {
 if(message.content.startsWith(`${prefix}ban`)) {
     let member = message.mentions.members.first();
     member.ban().then((member) => {
-        message.channel.send("*БАМ* Пользователь был забанен")
+        message.channel.send("*Whoosh* User was banned")
       return console.log(`> banned member  ${message.author.username}`);
     
     })
@@ -121,10 +122,10 @@ async function execute(message, serverQueue) {
 	const args = message.content.split(' ');
 
 	const voiceChannel = message.member.voice.channel;
-	if (!voiceChannel) return message.channel.send('Зайди в голосовой канал чтобы продолжить воспроизведение!');
+	if (!voiceChannel) return message.channel.send('Join the voice channel bcz i need to know where to play music');
 	const permissions = voiceChannel.permissionsFor(message.client.user);
 	if (!permissions.has('CONNECT') || !permissions.has('SPEAK')) {
-		return message.channel.send('Дай мне разрешение зайти в канал!');
+		return message.channel.send('Allow me to join the channel');
 	}
 
 	const songInfo = await ytdl.getInfo(args[1]);
@@ -159,19 +160,19 @@ async function execute(message, serverQueue) {
 	} else {
 		serverQueue.songs.push(song);
 		console.log(serverQueue.songs);
-		return message.channel.send(`${song.title} Добавленно в очередь!`);
+		return message.channel.send(`${song.title} Added to queue!`);
 	}
 
 }
 
 function skip(message, serverQueue) {
-	if (!message.member.voice.channel) return message.channel.send('Зайди в голосовой канал чтобы остановить музон!');
-	if (!serverQueue) return message.channel.send('Я не могу скипнуть так как в очереди нету музона!');
+	if (!message.member.voice.channel) return message.channel.send('Join the voice channel to skip!');
+	if (!serverQueue) return message.channel.send('I cant skip there is no music in queue!');
 	serverQueue.connection.dispatcher.end();
 }
 
 function stop(message, serverQueue) {
-	if (!message.member.voice.channel) return message.channel.send('Эй бро зайди в голосовой канал чтобы послушать музыку!');
+	if (!message.member.voice.channel) return message.channel.send('Hey join the voice channel to play music!');
 	serverQueue.songs = [];
 	serverQueue.connection.dispatcher.end();
 }
@@ -187,7 +188,7 @@ function play(guild, song) {
 
 	const dispatcher = serverQueue.connection.play(ytdl(song.url))
 		.on('end', () => {
-			console.log('Музон кончился!');
+			console.log('End of the song!');
 			serverQueue.songs.shift();
 			play(guild, serverQueue.songs[0]);
 		})
@@ -205,7 +206,7 @@ client.on('message', message =>{
 		const Embed = new Discord.MessageEmbed()
 		.setColor(0x00BDFF)
 		.setTitle("тест")
-		.setDescription("тест")
+		.setDescription("Test")
 
 	if (!args[1]) {
 		message.channel.send(Embed);
@@ -213,7 +214,7 @@ client.on('message', message =>{
 
 	let msgArgs = args.slice(1).join(" ");
 
-	message.channel.send("голосование! " + "**" + msgArgs + "**").then(messageReaction => {
+	message.channel.send("Poll! " + "**" + msgArgs + "**").then(messageReaction => {
 		messageReaction.react("👍");
 		messageReaction.react("👎");
 		message.delete({ timeout: 1000 }).catch(console.error);
@@ -290,17 +291,17 @@ client.on('message', message =>{
 		switch(args[0]){
 			case 'stat':
 	 
-				if(!args[1]) return message.channel.send('Вы не указали Ip')
-				if(!args[2]) return message.channel.send('Вы не указали порт')
+				if(!args[1]) return message.channel.send('You didnt specify the ip')
+				if(!args[2]) return message.channel.send('You didnt specify the port')
 	 
 				ping(args[1], parseInt(args[2]), (error, reponse) =>{
 					if(error) throw error
 					const Embed = new Discord.MessageEmbed()
-					.setTitle('Статусник')
-					.addField('Айпишник', reponse.host)
-					.addField('Вирсия', reponse.version)
-					.addField('Кубоголовых в сети', reponse.onlinePlayers)
-					.addField('Макс количество кубоголовых', reponse.maxPlayers)
+					.setTitle('Status')
+					.addField('IP', reponse.host)
+					.addField('Version', reponse.version)
+					.addField('Minecrafters online', reponse.onlinePlayers)
+					.addField('Maximum amount of Players', reponse.maxPlayers)
 				   
 					message.channel.send(Embed)
                        return console.log(`> checked mc server status  ${message.author.username}`);
@@ -321,20 +322,22 @@ client.on('message', message=>{
    switch(args[0]){
      case 'help':
       const embed = new Discord.MessageEmbed()
-        .setTitle('Помощь')
-        .addField('gm.play,stop,skip', 'Комманды для плеера музыки')
-        .addField('gm.8ball вопрос', 'Шар с предсказанием')
-        .addField('gm.offon', 'Покажет сколько челов онлайн и оффлайн')
-        .addField('gm.kick @упомянание', 'Кик Участника')
-        .addField('gm.ban @упомянание', 'бан Участника')
-        .addField('gm.poll текст', 'Голосование')
-        .addField('gm.nickchan новый ник', 'Сменит ваш ник ПОКА НОРМАЛЬНО НЕ РАБОТАЕТ!!!')
-        .addField('gm.stat айпи порт', 'Покажет статус сервера в майнкрафт')
-        .addField('Чтобы добавить канал приветствия', 'Создайте канал привет')
-        .addField('gm.pic', 'мем картинка')
-        .addField('gm.accinf @упомянание', 'Покажет информацию о участнике')
-        .addField('gm.id @упомянание ', 'узнать user id пользователя для тех кому лень включить режим разраба')
-        .addField('Создатель бота', 'Notcher3#8385')
+        .setTitle('Help')
+        .addField('gm.play,stop,skip', 'Music commands')
+        .addField('gm.8ball question', '8ball command')
+        .addField('gm.offon', 'Shows How many people are online')
+        .addField('gm.kick @упомянание', 'Kick a member')
+        .addField('gm.ban @ping', 'Ban member')
+        .addField('gm.poll Text', 'Poll command')
+        .addField('gm.nickchan new nickname', 'Changes your nickname')
+        .addField('gm.stat айпи порт', 'Shows Minecraft server status')
+        .addField('gm.pic', 'Sends a meme picture')
+        .addField('gm.accinf @ping', 'Shows member info')
+        .addField('gm.id @ping ', 'Shows user id')
+        .addField('gm.weather *insert location here*', 'Shows weather for any location credit to thesportstacker')
+        .addField('gm.covid', 'shows coronavirus statistics credit to thesportstacker')
+        .addField('Bot creator', 'Notcher3#8385')
+        .addField('Add to your server', '')
          .setColor(0x00BDFF)
         message.channel.send(embed);
       return console.log(`> used help  ${message.author.username}`);
@@ -381,13 +384,13 @@ client.on("message", async message => {
 if(com === `${prefix}accinf`) {
 	let ment = message.mentions.users.first();
 		if(!ment) {
-			message.channel.send('Укажите пользователя')
+			message.channel.send('Specify user')
 		}
 		let embed = new Discord.MessageEmbed()
-		.addField("Имя", ment.tag)
-		.addField("Айди", ment.id)
-		.addField("Статус", ment.presence.status)
-		.addField("Создан", ment.createdAt)
+		.addField("Name", ment.tag)
+		.addField("ID", ment.id)
+		.addField("Status", ment.presence.status)
+		.addField("Created", ment.createdAt)
 		.setThumbnail(ment.avatarURL)
 		message.channel.send(embed)
 		return console.log(`> userinfo command used by ${message.author.username}`);
@@ -405,9 +408,9 @@ client.on("message", message => {
 
     if (message.content.toLowerCase() == "gm.offon") {
         const embed = new Discord.MessageEmbed();
-        embed.setTitle(`Инфа о сервере`)
-        embed.addField("Онлайн", message.guild.members.cache.filter(member => member.presence.status !== "offline").size);
-        embed.addField("Не в сети", message.guild.members.cache.filter(member => member.presence.status == "offline").size);
+        embed.setTitle(`Server Online info`)
+        embed.addField("Online", message.guild.members.cache.filter(member => member.presence.status !== "offline").size);
+        embed.addField("Offline", message.guild.members.cache.filter(member => member.presence.status == "offline").size);
         message.channel.send(embed);
       return console.log(`> used offon  ${message.author.username}`);
     };
@@ -428,7 +431,7 @@ client.on('message', message=>{
 
 
 function resetBot(channel) {
-    channel.send('Перезагрузка')
+    channel.send('Reloading')
     .then(msg => client.destroy())
     .then(() => client.login(token));
 };
@@ -451,7 +454,7 @@ client.on("message", async message => {
 
 client.on('message', message => {
 if (message.content.includes('nickchan')) {
-    if (!message.guild.me.hasPermission('MANAGE_NICKNAMES')) return message.channel.send('Я не имею права!');
+    if (!message.guild.me.hasPermission('MANAGE_NICKNAMES')) return message.channel.send('I don`t have enough Permissions');
     message.member.setNickname(message.content.replace('gm.nickchan ', ''));
       return console.log(`> checked his nickname  ${message.author.username}`);
     }
@@ -467,7 +470,7 @@ client.on('message', function (message) {
  
   if (args[0].toLowerCase() === prefix + "8ball") {
       if (!args[1]) return message.channel.send("Не спросил вопрос ._.")
-      let answers = ["Неа", "Наверное", "не думаю", "Может быть", "Да"]
+      let answers = ["Nope", "Hrm maybe", "I don`t think so", "it might be true", "Yes"]
       let question = args.slice(1).join(" ")
       let embed = new Discord.MessageEmbed()
           .setAuthor(message.author.tag, message.author.displayAvatarURL)
@@ -476,6 +479,29 @@ client.on('message', function (message) {
           .addField("Ответ :", answers[Math.floor(Math.random() * answers.length)])
       message.channel.send(embed)
   }
+})
+
+
+client.on("message", async message => {
+
+    if(message.author.bot) return;
+    if(message.channel.type === 'dm') return;
+
+    if(message.content.startsWith(prefix)) {
+        const args = message.content.slice(prefix.length).trim().split(/ +/);
+
+        const command = args.shift().toLowerCase();
+
+        if(!client.commands.has(command)) return;
+
+
+        try {
+            client.commands.get(command).run(client, message, args);
+
+        } catch (error){
+            console.error(error);
+        }
+    }
 })
 
 
