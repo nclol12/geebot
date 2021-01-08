@@ -1,9 +1,11 @@
-﻿const  Discord = require('discord.js');
+const Discord = require('discord.js');
+const util = require('util')
 const avconv = require('avconv')
 const opusscript = require('opusscript')
 const ffmpeg = require('ffmpeg')
 const queue = new Map();
-const {prefix , token } = require('./config.json');
+const {prefix , token , ownerID , PREFIX , port , default_prefix} = require('./config.json');
+const config = require('./config.json');
 const client = new Discord.Client();
 const ytdl = require('ytdl-core')
 const cheerio = require('cheerio')
@@ -14,8 +16,9 @@ const ping = require('minecraft-server-util')
 const Embed = new Discord.MessageEmbed()
 const moment = require('moment');
 const fs = require('fs');
+const { readdirSync } = require('fs');
 const { join } = require('path');
-var version = '1.3';
+var version = '1.9';
 var servers = {};
 
 
@@ -34,14 +37,15 @@ client.user.setPresence({
 
 })
 
+
 client.commands = new Discord.Collection();
- 
-const commandFiles = fs.readdirSync('./cmds/').filter(file => file.endsWith('.js'));
-for(const file of commandFiles){
-    const command = require(`./cmds/${file}`);
- 
+const commandFiles = readdirSync(join(__dirname, "cmds")).filter(file => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+    const command = require(join(__dirname, "cmds", `${file}`));
     client.commands.set(command.name, command);
 }
+
 
 
 
@@ -326,18 +330,21 @@ client.on('message', message=>{
         .addField('gm.play,stop,skip', 'Music commands')
         .addField('gm.8ball question', '8ball command')
         .addField('gm.offon', 'Shows How many people are online')
-        .addField('gm.kick @упомянание', 'Kick a member')
+        .addField('gm.kick @ping', 'Kick a member')
         .addField('gm.ban @ping', 'Ban member')
         .addField('gm.poll Text', 'Poll command')
         .addField('gm.nickchan new nickname', 'Changes your nickname')
-        .addField('gm.stat айпи порт', 'Shows Minecraft server status')
+        .addField('gm.stat ip port', 'Shows Minecraft server status')
         .addField('gm.pic', 'Sends a meme picture')
         .addField('gm.accinf @ping', 'Shows member info')
         .addField('gm.id @ping ', 'Shows user id')
-        .addField('gm.weather *insert location here*', 'Shows weather for any location credit to thesportstacker')
-        .addField('gm.covid', 'shows coronavirus statistics credit to thesportstacker')
+        .addField('gm.weather *insert location here*', 'Shows weather for any location ')
+        .addField('gm.covid', 'shows coronavirus statistics')
+        .addField('gm.daily , gm.bal','Economy commands')
+        .addField('gm.ticket-setup  #channel,gm.close in ticket channel','Ticket Command')
+        .addField('gm.clever message','Cleverbot command')
         .addField('Bot creator', 'Notcher3#8385')
-        .addField('Add to your server', '')
+        .addField('Add to your server', 'https://discordapp.com/oauth2/authorize?&client_id=683242826875535366&scope=bot&permissions=8')
          .setColor(0x00BDFF)
         message.channel.send(embed);
       return console.log(`> used help  ${message.author.username}`);
@@ -503,6 +510,25 @@ client.on("message", async message => {
         }
     }
 })
+
+client.on("message", message => {
+  const args = message.content.split(" ").slice(1);
+ 
+  if (message.content.startsWith(config.prefix + "eval")) {
+    if(message.author.id !== config.ownerID) return;
+    try {
+      const code = args.join(" ");
+      let evaled = eval(code);
+ 
+      if (typeof evaled !== "string")
+        evaled = require("util").inspect(evaled);
+ 
+      message.channel.send(evaled), {code:"xl"};
+    } catch (err) {
+      message.channel.send(`\`ERROR\` \`\`\`xl\n${(err)}\n\`\`\``);
+    }
+  }
+});
 
 
 client.login(token);
