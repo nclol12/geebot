@@ -344,7 +344,7 @@ client.on('message', message=>{
         .addField('gm.ticket-setup  #channel,gm.close in ticket channel','Ticket Command')
         .addField('gm.clever message','Cleverbot command')
         .addField('Bot creator', 'Notcher3#8385')
-        .addField('Add to your server', 'https://discordapp.com/oauth2/authorize?&client_id=683242826875535366&scope=bot&permissions=8')
+        .addField('Add to your server', '')
          .setColor(0x00BDFF)
         message.channel.send(embed);
       return console.log(`> used help  ${message.author.username}`);
