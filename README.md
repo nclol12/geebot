@@ -2,5 +2,4 @@
 My bot that i wrote on javascript 
 
 You can freely modify the code but you need to mention that original code was done by me and some other people 
-especially thx 
-CodeLyon for music player code
+
